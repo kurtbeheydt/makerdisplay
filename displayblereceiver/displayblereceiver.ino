@@ -1,5 +1,3 @@
-/* for esp32 */
-
 /* --- neopixel display for esp32 --- */
 #include <FastLED_NeoMatrix.h>
 
@@ -24,7 +22,6 @@ const uint16_t colors[] = { matrix->Color(255, 0, 0), matrix->Color(0, 255, 0), 
 int matrixPosX;
 
 /* --- ble --- */
-
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
@@ -50,7 +47,6 @@ uint8_t messageId = 0;
 #define CHARACTERISTIC_UUID_TX "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
 /* --- general vars --- */
-
 unsigned long currentMillis;
 unsigned long previousMillis = 0;
 int displayInterval = 100;
@@ -58,7 +54,9 @@ int displayInterval = 100;
 const int messageQueueLength = 20;
 String messages[messageQueueLength];
 int newMessageQueueId = 0;
+
 const int defaultMessageQueueLength = 4;
+int defaultMessageId = 0;
 String defaultMessages[defaultMessageQueueLength] = {
     "Dit is de warmste makerspace",
     "Schrijf een bericht voor de makers",
@@ -66,6 +64,14 @@ String defaultMessages[defaultMessageQueueLength] = {
     "Volg @canvastv op instagram"
 };
 
+
+/* blacklog 
+ *  add ldr support for light sensitivity
+ *  random colors? More color variation on the letters?
+ */
+
+
+/* functions */
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       deviceConnected = true;
@@ -90,6 +96,8 @@ class MyCharacteristicCallbacks: public BLECharacteristicCallbacks {
 };
 
 void fetchNextMessage() {
+  matrix->setTextColor(getMatrixColor());
+  
   if (messages[0].length() > 0) {
     matrixText = messages[0];
     for (uint8_t x = 1; x < messageQueueLength; x++) {
@@ -97,13 +105,15 @@ void fetchNextMessage() {
     }
     newMessageQueueId--;
   } else {
-    int x = random(0, defaultMessageQueueLength);
-    matrixText = defaultMessages[x];
+    matrixText = defaultMessages[defaultMessageId];
+    defaultMessageId++;
+    if (defaultMessageId >= defaultMessageQueueLength) {
+      defaultMessageId = 0;
+    }
   } 
   
-  maxDisplacement = matrixText.length() * pixelPerChar + MATRIXWIDTH - 20;
+  maxDisplacement = matrixText.length() * pixelPerChar + MATRIXWIDTH - 30; // added -30 to speed up the next message 
   matrixPosX = MATRIXWIDTH;
-  matrix->setTextColor(getMatrixColor());
 }
 
 uint16_t getMatrixColor() {
@@ -156,14 +166,12 @@ bool initBLE() {
 
 void setup() {
   pinMode(statusLedPin, OUTPUT);
-  randomSeed(analogRead(A0));
     
   FastLED.addLeds<NEOPIXEL,PIN>(matrixleds, NUMMATRIX); 
   matrix->begin();
   matrix->setTextWrap(false);
   matrix->setBrightness(40);
   matrix->setCursor(0, 0);
-  matrix->setTextColor(getMatrixColor());
   matrix->print("booting...");
   matrix->show();
 
