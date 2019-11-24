@@ -29,7 +29,6 @@ int matrixPosX;
 #include <BLEAdvertisedDevice.h>
 
 #define statusLedPin 2
-
 #define DEVICE_NAME "WWBA"
 
 BLEServer *pServer = NULL;
