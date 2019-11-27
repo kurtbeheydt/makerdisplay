@@ -3,7 +3,7 @@
 
 #define PIN 13
 
-#define MATRIXWIDTH 64
+#define MATRIXWIDTH 96
 #define MATRIXHEIGHT 8
 #define NUMMATRIX (MATRIXWIDTH * MATRIXHEIGHT)
 
@@ -60,7 +60,7 @@ String defaultMessages[defaultMessageQueueLength] = {
     "Dit is de warmste makerspace",
     "Schrijf een bericht voor de makers",
     "Team Scheire maakt oplossingen voor problemen",
-    "Volg @canvastv op instagram"
+    "Volg ons op instagram via @canvas_tv"
 };
 
 
